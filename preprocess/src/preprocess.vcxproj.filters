@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\zl\Ross Lab\sept8-sept15\point and polygon\preprocessing\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\zl\Ross Lab\sept8-sept15\point and polygon\preprocessing\src\fileio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\zl\Ross Lab\sept8-sept15\point and polygon\preprocessing\src\pointandpolygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\zl\Ross Lab\sept8-sept15\point and polygon\preprocessing\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6254A9B1-444D-33CD-B4B8-C3EF6448BDD3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{89CEC0F3-925B-30B1-94DF-42CAF84FD88D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
