@@ -9,6 +9,8 @@ using std::unordered_map;
 
 #define BIAS 0.0000001
 #define MAX_DIST (double)INT_MAX
+#define M_PI 3.14159265358979323846
+#define earthRadiusKm 6371.0
 
 struct Point_2d{
   double x;
@@ -23,21 +25,45 @@ struct Point_2d{
     else return false;
   }
 
+  double deg2rad(double deg)const {
+    return ( deg * M_PI / 180 );
+  }
+
+  //  This function converts radians to decimal degrees
+  double rad2deg(double rad) const{
+    return ( rad * 180 / M_PI );
+  }
+
+  double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) const{
+    double lat1r, lon1r, lat2r, lon2r, u, v;
+    lat1r = deg2rad(lat1d);
+    lon1r = deg2rad(lon1d);
+    lat2r = deg2rad(lat2d);
+    lon2r = deg2rad(lon2d);
+    u = sin(( lat2r - lat1r ) / 2);
+    v = sin(( lon2r - lon1r ) / 2);
+    return 2.0 * earthRadiusKm * asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
+  }
+
   double toSegDist(const Point_2d &point1, const Point_2d &point2)const{
     double cross = ( point2.x - point1.x )*( x - point1.x )
       + ( point2.y - point1.y )*( y - point1.y );
-    std::cout << "cross: " << cross << std::endl;
+   // std::cout << "cross: " << cross << std::endl;
     if (cross <= 0)
-      return sqrt(( x - point1.x )*( x - point1.x ) + ( y - point1.y )*( y - point1.y ));
+      return distanceEarth(y, x, point1.y, point1.x);
+      //sqrt(( x - point1.x )*( x - point1.x ) + ( y - point1.y )*( y - point1.y ));
     double d2 = ( point2.x - point1.x )*( point2.x - point1.x )
       + ( point2.y - point1.y )*( point2.y - point1.y );
-    std::cout << "d2: " << d2 << std::endl;
+   // std::cout << "d2: " << d2 << std::endl;
     if (cross >= d2)
-      return sqrt(( x - point2.x )*( x - point2.x ) + ( y - point2.y )*( y - point2.y ));
+      return distanceEarth(y, x, point2.y, point2.x);
+      //sqrt(( x - point2.x )*( x - point2.x ) + ( y - point2.y )*( y - point2.y ));
+    
     double r = cross / d2;
     double px = point1.x + ( point2.x - point1.x )*r;
     double py = point1.y + ( point2.y - point1.y )*r;
-    return sqrt(( x - px )*( x - px ) + ( py - y )*( py - y ));
+    return distanceEarth(point1.y, point1.x, point2.y, point2.x);
+      //sqrt(( x - px )*( x - px ) + ( py - y )*( py - y ));
   }
 };
 
@@ -48,9 +74,18 @@ struct Polygon{
   }
 
   Polygon(double *data, unsigned int size) {
-    //read data as a list of  x0, y0, x1, y1, etc
+    //construction: read data as a list of  x0, y0, x1, y1, etc
     for (unsigned int i = 1; i < size; i = i + 2) {
       coords.push_back(Point_2d(data[i - 1], data[i]));
+    }
+    if (!( coords[coords.size() - 1] == coords[0] )) coords.push_back(coords[0]);
+    //link the last node to the first node
+  }
+
+  Polygon(double *data_x, double *data_y, unsigned int size) {
+    //construct from a list of x and y
+    for (unsigned i = 0; i < size; i++) {
+      coords.push_back(Point_2d(data_x[i]/10000, data_y[i]/10000));
     }
     if (!( coords[coords.size() - 1] == coords[0] )) coords.push_back(coords[0]);
     //link the last node to the first node
@@ -95,6 +130,15 @@ struct Grid{
     for (unsigned int i = 0; i < row*column; i++){
       coords.push_back(points[i]);
     }
+  }
+
+  void addPoint(double x, double y) {
+    coords.push_back(Point_2d(x, y));
+  }
+
+  void setRowCol(unsigned row, unsigned col){
+    this->row = row;
+    this->column = col;
   }
 };
 

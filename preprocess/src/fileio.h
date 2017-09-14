@@ -19,11 +19,18 @@ int initCsv(void *file = nullptr) {
   return 0;
 }
 
-int initProtectedArea(vector<Polygon> &areas, void *file = nullptr){
-  char *filedic = (char *)file;
+int initProtectedArea(vector<Polygon> &areas, char *file = nullptr){
+  char *filedic = file;
   // the file directory is to be input
-  while (1/*not end of file*/) {
-    //read file
+  SHPHandle fileHandle = SHPOpen(filedic, "rb");
+  if (fileHandle == nullptr) return 1;
+  int pnEntities, pnShapeType;
+  double *padfMinBound, *padMaxBound;
+  SHPGetInfo(fileHandle, &pnEntities, &pnShapeType, nullptr, nullptr);
+  for (unsigned i = 0; i < pnEntities; i++){
+    SHPObject *shpObj = SHPReadObject(fileHandle, i);
+    areas.push_back(Polygon(shpObj->padfX, shpObj->padfY, shpObj->nVertices));
   }
+  SHPClose(fileHandle);
   return 0;
 }
