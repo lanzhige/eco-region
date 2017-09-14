@@ -6,4 +6,11 @@ if (BUILD_PREPROCESS)
 project(preprocess)
 endif()
 
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/include")
+link_directories("${PROJECT_SOURCE_DIR}/lib")
+set(CMAKE_PROGRAM_PATH "${PROJECT_SOURCE_DIR}/bin")
+set(CMAKE_LIBRARY_PATH "${PROJECT_SOURCE_DIR}/lib")
+
+
 add_subdirectory(src)
