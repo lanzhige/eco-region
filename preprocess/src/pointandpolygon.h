@@ -7,7 +7,7 @@
 using std::vector;
 using std::unordered_map;
 
-#define BIAS 0.0000001
+#define BIAS 0.0000000000000001
 #define MAX_DIST (double)INT_MAX
 #define M_PI 3.14159265358979323846
 #define earthRadiusKm 6371.0
@@ -45,70 +45,94 @@ struct Point_2d{
     return 2.0 * earthRadiusKm * asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
   }
 
-  double toSegDist(const Point_2d &point1, const Point_2d &point2)const{
-    double cross = ( point2.x - point1.x )*( x - point1.x )
-      + ( point2.y - point1.y )*( y - point1.y );
+  double dotProduct(const Point_2d &p1, const Point_2d &p2) const {
+    return ( p2.x - p1.x )*( x - p2.x ) + ( p2.y - p1.y )*( y - p2.y );
+  }
+
+  double crossProduct(const Point_2d &p1, const Point_2d &p2) const {
+    return ( p2.x - p1.x )*( y - p1.y ) - ( p2.y - p1.y )*( x - p1.x );
+  }
+
+  double toSegDist(const Point_2d &p1, const Point_2d &p2)const{
+    double dot1 = dotProduct(p1, p2);
+    if (dot1 > 0) return distanceEarth(p2.y, p2.x, y, x);
+    double dot2 = dotProduct(p2, p1);
+    if (dot2 > 0) return distanceEarth(p1.y, p1.x, y, x);
+
+    double k = k = ((x- p1.x) * (p2.x - p1.x) + (y - p1.y) * (p2.y - p1.y) )  / ( (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y) ) ;
+    return distanceEarth(p1.y + k*( p2.y - p1.y ), p1.x + k*( p2.x - p1.x ), y, x);
+
+    //double cross = ( point2.x - point1.x )*( x - point1.x )
+    //  + ( point2.y - point1.y )*( y - point1.y );
    // std::cout << "cross: " << cross << std::endl;
-    if (cross <= 0)
-      return distanceEarth(y, x, point1.y, point1.x);
-      //sqrt(( x - point1.x )*( x - point1.x ) + ( y - point1.y )*( y - point1.y ));
-    double d2 = ( point2.x - point1.x )*( point2.x - point1.x )
-      + ( point2.y - point1.y )*( point2.y - point1.y );
+    //if (cross <= 0)
+      //return //distanceEarth(y, x, point1.y, point1.x);
+     // sqrt(( x - point1.x )*( x - point1.x ) + ( y - point1.y )*( y - point1.y ));
+    //double d2 = ( point2.x - point1.x )*( point2.x - point1.x )
+    //  + ( point2.y - point1.y )*( point2.y - point1.y );
    // std::cout << "d2: " << d2 << std::endl;
-    if (cross >= d2)
-      return distanceEarth(y, x, point2.y, point2.x);
-      //sqrt(( x - point2.x )*( x - point2.x ) + ( y - point2.y )*( y - point2.y ));
+    //if (cross >= d2)
+      //return //distanceEarth(y, x, point2.y, point2.x);
+    //  sqrt(( x - point2.x )*( x - point2.x ) + ( y - point2.y )*( y - point2.y ));
     
-    double r = cross / d2;
-    double px = point1.x + ( point2.x - point1.x )*r;
-    double py = point1.y + ( point2.y - point1.y )*r;
-    return distanceEarth(point1.y, point1.x, point2.y, point2.x);
-      //sqrt(( x - px )*( x - px ) + ( py - y )*( py - y ));
+    //double r = cross / d2;
+    //double px = point1.x + ( point2.x - point1.x )*r;
+    //double py = point1.y + ( point2.y - point1.y )*r;
+    //return //distanceEarth(point1.y, point1.x, point2.y, point2.x);
+    //  sqrt(( x - px )*( x - px ) + ( py - y )*( py - y ));
   }
 };
 
 struct Polygon{
-  vector<Point_2d> coords;
-  Polygon(const vector<Point_2d> &ref) {
+  vector<Point_2d *> coords;
+  Polygon(){ coords.clear(); }
+  Polygon(const vector<Point_2d *> &ref) {
     coords = ref;
+    //error here need to be changed
   }
 
   Polygon(double *data, unsigned int size) {
     //construction: read data as a list of  x0, y0, x1, y1, etc
     for (unsigned int i = 1; i < size; i = i + 2) {
-      coords.push_back(Point_2d(data[i - 1], data[i]));
+
+      coords.push_back(new Point_2d(data[i - 1], data[i]));
     }
-    if (!( coords[coords.size() - 1] == coords[0] )) coords.push_back(coords[0]);
+    if (!( coords[coords.size() - 1] == coords[0] )) coords.emplace_back(coords[0]);
     //link the last node to the first node
   }
 
   Polygon(double *data_x, double *data_y, unsigned int size) {
     //construct from a list of x and y
     for (unsigned i = 0; i < size; i++) {
-      coords.push_back(Point_2d(data_x[i]/10000, data_y[i]/10000));
+      coords.push_back(new Point_2d(data_x[i]/10000, data_y[i]/10000));
     }
-    if (!( coords[coords.size() - 1] == coords[0] )) coords.push_back(coords[0]);
+    if (!( coords[coords.size() - 1] == coords[0] )) coords.emplace_back(coords[0]);
     //link the last node to the first node
+  }
+
+  void addPoint(Point_2d *p) {
+    coords.push_back(p);
   }
 
   bool contain(const Point_2d &point) const {
     unsigned crossings = 0;
     for (unsigned int i = 1; i < coords.size(); i++){
-      if (fabs(coords[i].x - coords[i - 1].x)<BIAS) continue;
-      double slope = ( coords[i].y - coords[i - 1].y ) / ( coords[i].x - coords[i - 1].x );
-      bool cond1 = ( coords[i - 1].x <= point.x ) && ( point.x < coords[i].x );
-      bool cond2 = ( coords[i].x <= point.x ) && ( point.x < coords[i - 1].x );
-      bool above = ( point.y <( slope*( point.x - coords[i - 1].x ) + coords[i - 1].y ) );
+      //if (fabs(coords[i]->x - coords[i - 1]->x)<BIAS) continue;
+      //double slope = ( coords[i]->y - coords[i - 1]->y ) / ( coords[i]->x - coords[i - 1]->x );
+      bool cond1 = ( coords[i - 1]->x <= point.x ) && ( point.x < coords[i]->x );
+      bool cond2 = ( coords[i]->x <= point.x ) && ( point.x < coords[i - 1]->x );
+      bool above = ( point.y <=(( point.x - coords[i - 1]->x )*( coords[i]->y - coords[i - 1]->y ) / ( coords[i]->x - coords[i - 1]->x ) + coords[i - 1]->y ) );
       if (( cond1 || cond2 ) && above) crossings++;
     }
-    return crossings & 1;
+    if (crossings % 2 == 0) return false; else return true;
+    //return crossings & 1;
     //can only judge if a point is inside a simple polygon
   }
 
   double shortestDistance(const Point_2d &point) const {
     double min_dist = MAX_DIST, dist;
     for (unsigned i = 1; i < coords.size(); i++) {
-      dist = point.toSegDist(coords[i - 1], coords[i]);
+      dist = point.toSegDist(*coords[i - 1], *coords[i]);
       if (dist < min_dist) min_dist = dist;
     }
     return min_dist;
@@ -117,23 +141,24 @@ struct Polygon{
 
 struct Grid{
   unsigned int row, column;
-  vector<Point_2d> coords;
+  vector<Point_2d *> coords;
   //double length, width; 
   // if the cells of grid can't be replaced by a point or the length and width of each cell should be recorded
-  Grid(){ }
+  Grid(){ coords.clear(); }
 
   Grid(unsigned int row, unsigned int column) :row(row), column(column) { }
 
-  Grid(unsigned int row, unsigned int column, const Point_2d *points){
+  Grid(unsigned int row, unsigned int column, Point_2d *points){
     this->row = row;
     this->column = column;
     for (unsigned int i = 0; i < row*column; i++){
-      coords.push_back(points[i]);
+      coords.emplace_back(&points[i]);
     }
   }
 
   void addPoint(double x, double y) {
-    coords.push_back(Point_2d(x, y));
+    Point_2d *p = new Point_2d(x, y);
+    coords.push_back(p);
   }
 
   void setRowCol(unsigned row, unsigned col){
@@ -154,8 +179,8 @@ struct ValueGrid{
 
   void getValue(const Polygon& polygon){
     for (unsigned i = 0; i < dist.size(); i++) {
-      if (polygon.contain(grid->coords[i])) dist[i] = -1;
-      else dist[i] = polygon.shortestDistance(grid->coords[i]);
+      if (polygon.contain(*( grid->coords[i] ))) { dist[i] = -1.0; }
+      else dist[i] = polygon.shortestDistance(*(grid->coords[i]));
     }
   }
 };
