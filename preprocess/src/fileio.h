@@ -2,7 +2,8 @@
 shp file read and csv file read
 currently synchronized io
 */
-#pragma once
+#ifndef FILEIO_H_
+#define FILEIO_H_
 #include <iostream>
 #include <fstream>
 #include <shapelib-1.4.0/shapefil.h>
@@ -118,3 +119,5 @@ int txtArrayToJson(const char* file) {
   os << "]";
   return 0;
 }
+
+#endif

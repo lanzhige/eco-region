@@ -1,4 +1,5 @@
-#pragma once
+#ifndef POINTANDPOLYGON_H_
+#define POINTANDPOLYGON_H_
 #include<iostream>
 #include<vector>
 #include<unordered_map>
@@ -8,7 +9,7 @@ using std::vector;
 using std::unordered_map;
 
 #define BIAS 0.0000000000000001
-#define MAX_DIST (double)INT_MAX
+#define MAX_DIST (double)(2000000000)
 #define M_PI 3.14159265358979323846
 #define earthRadiusKm 6371.0
 
@@ -184,3 +185,5 @@ struct ValueGrid{
     }
   }
 };
+
+#endif
