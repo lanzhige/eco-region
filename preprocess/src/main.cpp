@@ -10,12 +10,12 @@ using std::vector;
 int main() {
   vector<Polygon *> areas;
   vector<ValueGrid> value_grids;
-  //txtArrayToJson("D:\\zl\\Ross Lab\\sept8-sept15\\point and polygon\\preprocessing\\data\\test1.txt");
+  txtArrayToJson("/home/lzhan253/project/eco-region/preprocess/data/test1.txt");
   //return 0;
-  if (initJsonArea(areas,"D:\\zl\\Ross Lab\\sept8-sept15\\point and polygon\\preprocessing\\data\\test.json")) return 1;
+  if (initJsonArea(areas,"/home/lzhan253/project/eco-region/preprocess/data/test.json")) return 1;
   std::cout << "start read txt file" << std::endl;
   ifstream fin;
-  fin.open("D:\\zl\\Ross Lab\\sept8-sept15\\point and polygon\\preprocessing\\data\\test1.txt");
+  fin.open("/home/lzhan253/project/eco-region/preprocess/data/test1.txt");
   if (!fin.good()) return 1;
   Grid grid; 
   unsigned total = 0;

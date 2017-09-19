@@ -74,7 +74,7 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
 }
 
 int outJson(vector<Polygon *> &areas, Grid &grid){
-  std::ofstream os("D:\\zl\\Ross Lab\\sept8-sept15\\point and polygon\\preprocessing\\data\\out.json", std::ofstream::out);
+  std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);
   os.precision(17);
   os << "[\n";
   for (unsigned i = 0; i < areas.size(); i++){
@@ -98,7 +98,7 @@ int outJson(vector<Polygon *> &areas, Grid &grid){
 }
 
 int txtArrayToJson(const char* file) {
-  std::ofstream os("array.json", std::ofstream::out);
+  std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/array.json", std::ofstream::out);
   os.precision(17);
   os << "[\n";
   int total = 0;
