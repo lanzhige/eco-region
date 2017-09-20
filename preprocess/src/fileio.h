@@ -96,15 +96,16 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);
   os.precision(17);
-  os << "[\n";
+  os << "[{\n";
   for (unsigned i = 0; i < areas.size(); i++){
     ValueGrid value_grid(&grid);
     value_grid.getValue(*( areas[i] ));
     if (i > 0) os << ",\n";
-    os << "{\"polyid\": "<<i<<","<<"\"distset\": [";
+    os << "{\"PA_id\": "<<i<<","<<"\"dist_set\": [";
     for (unsigned j = 0; j < grid.coords.size(); j++){
       if (j > 0) os << ",";
-      os << "[" << grid.coords[j]->x << "," << grid.coords[j]->y << "," << value_grid.dist[j] << "]";
+      os << "{" << "\"grid_id\":" << j << "\"dist\":" << value_grid.dist[j] << "}";
+        //<< grid.coords[j]->x << "," << grid.coords[j]->y << "," << value_grid.dist[j] << "]";
     }
     os << "]}";
    
@@ -112,7 +113,7 @@ int outJson(vector<Polygon *> &areas, Grid &grid){
     //break;
     //add value_grid dist to mongodb
   }
-  os << "]";
+  os << "}]";
   os.close();
   return 0;
 }
@@ -131,7 +132,8 @@ int txtArrayToJson(const char* file) {
     fin >> c;
     fin >> p1x >> p1y >> p2x >> p2y >> p3x >> p3y >> p4x >> p4y;
     if (total > 0) os << ",\n";
-    os << "[[" << p1y << "," << p1x << "],[" << p2y << "," << p2x << "],[" << p3y << "," << p3x << "],[" << p4y << "," << p4x << "]]";
+    os << "{" << "\"id\":" << total<<",";
+    os << "\"coordinates\":[[" << p1y << "," << p1x << "],[" << p2y << "," << p2x << "],[" << p3y << "," << p3x << "],[" << p4y << "," << p4x << "]]}";
     total++;
     fin >> c;
     if (total > 159999) break;
