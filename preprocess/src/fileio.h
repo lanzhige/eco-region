@@ -9,7 +9,26 @@ currently synchronized io
 #include <shapelib-1.4.0/shapefil.h>
 #include <fast-csv-parser/csv.h>
 #include <jsoncpp-master/include/json/json.h>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
+
 #include"pointandpolygon.h"
+
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
+
+int initMongo(){
+  mongocxx::instance instance{};
+  mongocxx::uri uri("mongodb://localhost:27017");
+  mongocxx::client client(uri);
+  return 0;
+}
 
 int initCsv(void *file = nullptr) {
   //example:
