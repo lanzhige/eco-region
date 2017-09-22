@@ -7,7 +7,7 @@
 using std::ifstream;
 using std::vector;
 
-int main() {
+/*int main() {
   vector<Polygon *> areas;
   vector<ValueGrid> value_grids;
   txtArrayToJson("/home/lzhan253/project/eco-region/preprocess/data/test1.txt");
@@ -23,15 +23,15 @@ int main() {
   std::cerr << "start read to var" << std::endl;
   std::cout.precision(17);
   std::cerr.precision(17);
-  char c;
+//  char c;
   while (!fin.eof()){
-    fin >> c;
+//    fin >> c;
     fin >> p1x >> p1y >> p2x >> p2y >> p3x >> p3y >> p4x >> p4y;
     //scanf
     grid.addPoint(( p1y + p2y + p3y + p4y ) / 4.0, ( p1x + p2x + p3x + p4x ) / 4.0);
     //std::cerr<<"grid 0: "<<grid.coords[0]->x<<std::endl;
     total++;
-    fin >> c;
+//    fin >> c;
     if (total > 159999) break;
     
     //if (total<4) std::cout << p1x << p1y << p2x << p2y << p3x << p3y << p4x << p4y << std::endl;
@@ -42,26 +42,12 @@ int main() {
   //std::cerr << grid.coords[0]->x << "  " << grid.coords[0]->y << std::endl;
   //std::cerr << grid.coords[total-1]->x << " " << grid.coords[total-1]->y << std::endl;
   outJson(areas, grid);
-  /*for (unsigned i = 0; i < areas.size(); i++){
-    ValueGrid value_grid(&grid);
-    value_grid.getValue(*(areas[i]));
-    //value_grids.emplace_back(value_grid);
-    //break;
-    //add value_grid dist to mongodb
-  }*/
-
-  //std::cout << total << std::endl;
-  /*for (unsigned i = 0; i < areas[0]->coords.size(); i++){
-    std::cout << areas[0]->coords[i]->x << " " << areas[0]->coords[i]->y << std::endl;
-  }
-
-  for (unsigned i = 0; i < 100; i++){
-    std::cerr << grid.coords[i]->x << " " << grid.coords[i]->y << " " << std::endl;
-    std::cerr << value_grids[0].dist[i]<< std::endl;
-  }*/
   std::cerr << "finished!" << std::endl;
   
  // int test;
  // std::cin >> test;
   return 0;
+}*/
+int main(){
+  return initMongo();
 }

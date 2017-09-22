@@ -9,27 +9,44 @@ currently synchronized io
 #include <shapelib-1.4.0/shapefil.h>
 #include <fast-csv-parser/csv.h>
 #include <jsoncpp-master/include/json/json.h>
-//#include <bsoncxx/json.hpp>
-//#include <mongocxx/client.hpp>
-//#include <mongocxx/stdx.hpp>
-//#include <mongocxx/uri.hpp>
-//#include <mongocxx/instance.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/instance.hpp>
 
 #include"pointandpolygon.h"
 
-//using bsoncxx::builder::stream::close_array;
-//using bsoncxx::builder::stream::close_document;
-//using bsoncxx::builder::stream::document;
-//using bsoncxx::builder::stream::finalize;
-//using bsoncxx::builder::stream::open_array;
-//using bsoncxx::builder::stream::open_document;
+using bsoncxx::builder::stream::close_array;
+using bsoncxx::builder::stream::close_document;
+using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::open_array;
+using bsoncxx::builder::stream::open_document;
 
-/*int initMongo(){
+int initMongo(){
   mongocxx::instance instance{};
   mongocxx::uri uri("mongodb://localhost:27017");
   mongocxx::client client(uri);
+  mongocxx::database db = client["eco_region"];
+  mongocxx::collection coll = db["test"];
+  auto builder = bsoncxx::builder::stream::document{};
+  bsoncxx::document::value doc_value = builder
+  << "name" << "MongoDB"
+  << "type" << "database"
+  << "count" << 1
+  << "versions" << bsoncxx::builder::stream::open_array
+    << "v3.2" << "v3.0" << "v2.6"
+  << close_array
+  << "info" << bsoncxx::builder::stream::open_document
+    << "x" << 203
+    << "y" << 102
+  << bsoncxx::builder::stream::close_document
+  << bsoncxx::builder::stream::finalize;
+  bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
+  coll.insert_one(doc_value.view());
   return 0;
-}*/
+}
 
 int initCsv(void *file = nullptr) {
   //example:
@@ -68,7 +85,8 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
   if (reader.parse(is, root)) {
     int file_size;
     if (!root["features"].isNull()) file_size = root["features"].size();
-    for (int i = 556-6; i < file_size; i++){
+    for (int i = 0; i < file_size; i++){
+if (i!=894&&i!=1326&&i!=2295) continue;
       Json::Value coords = root["features"][i]["geometry"]["coordinates"];
       //std::cerr << root["features"][i]["properties"]["Category"].asString();
       int coords_size = coords.size();
@@ -86,7 +104,7 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
         }
         areas.push_back(polygon);
       }
-      break;
+      
     }
   }
   is.close();
@@ -96,15 +114,16 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);
   os.precision(17);
-  os << "[{\n";
+  os << "[\n";
   for (unsigned i = 0; i < areas.size(); i++){
     ValueGrid value_grid(&grid);
     value_grid.getValue(*( areas[i] ));
+std::cerr<<"add PA: "<<i<<std::endl;
     if (i > 0) os << ",\n";
     os << "{\"PA_id\": "<<i<<","<<"\"dist_set\": [";
     for (unsigned j = 0; j < grid.coords.size(); j++){
       if (j > 0) os << ",";
-      os << "{" << "\"grid_id\":" << j << "\"dist\":" << value_grid.dist[j] << "}";
+      os << "{" << "\"grid_id\":" << j << ",\"dist\":" << value_grid.dist[j] << "}";
         //<< grid.coords[j]->x << "," << grid.coords[j]->y << "," << value_grid.dist[j] << "]";
     }
     os << "]}";
@@ -113,7 +132,7 @@ int outJson(vector<Polygon *> &areas, Grid &grid){
     //break;
     //add value_grid dist to mongodb
   }
-  os << "}]";
+  os << "]";
   os.close();
   return 0;
 }
@@ -127,15 +146,15 @@ int txtArrayToJson(const char* file) {
   fin.open(file);
   if (!fin.good()) return 1;
   double p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y;
-  char c;
+ // char c;
   while (!fin.eof()) {
-    fin >> c;
+   // fin >> c;
     fin >> p1x >> p1y >> p2x >> p2y >> p3x >> p3y >> p4x >> p4y;
     if (total > 0) os << ",\n";
     os << "{" << "\"id\":" << total<<",";
     os << "\"coordinates\":[[" << p1y << "," << p1x << "],[" << p2y << "," << p2x << "],[" << p3y << "," << p3x << "],[" << p4y << "," << p4x << "]]}";
     total++;
-    fin >> c;
+  //  fin >> c;
     if (total > 159999) break;
   }
   os << "]";
