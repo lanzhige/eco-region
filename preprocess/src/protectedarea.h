@@ -23,8 +23,8 @@ struct ProtectedArea{
   vector<Cell *> cells;
 
   ProtectedArea() { clear(); }
-  ProtectedArea(){
-
+  ProtectedArea(string name) {
+    this->name = name;
   }
 
   int clear(){
@@ -37,11 +37,16 @@ struct ProtectedArea{
   int genBoundingBox(){
     if (polygons.size() == 0) return 0;
     for (unsigned i = 0; i < polygons.size(); i++){
-      polygons[i].resizeBoundingBox();
+      polygons[i]->resizeBoundingBox();
     }
-    Point_2d origin(*polygons[0]->coords[0]), destination(*polygons[0]->coords[0]);
-   
-      //calculate the bounding box of all the polygons in a protected area
+    
+    Point_2d origin(*polygons[0]->coords[0]);
+    Point_2d destination(*polygons[0]->coords[0]);
+
+    for (unsigned i = 0; i < polygons.size(); i++){
+      if (polygons[i]->bbox.origin)
+    }
+    //calculate the bounding box of all the polygons in a protected area
   }
 
   int output(){
