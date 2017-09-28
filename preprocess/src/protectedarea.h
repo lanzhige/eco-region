@@ -37,9 +37,12 @@ struct ProtectedArea{
   int genBoundingBox(){
     if (polygons.size() == 0) return 0;
     for (unsigned i = 0; i < polygons.size(); i++){
-      polygons[i].resizeBoundingBox();
+      polygons[i]->resizeBoundingBox();
     }
     Point_2d origin(*polygons[0]->coords[0]), destination(*polygons[0]->coords[0]);
+    for (unsigned i=0; i<polygons.size(); i++){
+      //find the bounding box of entire protected area.
+    }
    
       //calculate the bounding box of all the polygons in a protected area
   }
