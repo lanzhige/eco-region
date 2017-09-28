@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include"fileio.h"
-#include"pointandpolygon.h"
+#include"geometry.h"
 
 using std::ifstream;
 using std::vector;
@@ -49,5 +49,5 @@ using std::vector;
   return 0;
 }*/
 int main(){
-  return initMongo();
+  
 }

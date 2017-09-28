@@ -15,8 +15,8 @@ currently synchronized io
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
 
-#include"pointandpolygon.h"
-
+#include"geometry.h"
+/*
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::document;
@@ -58,7 +58,7 @@ int initCsv(void *file = nullptr) {
   }
 
   return 0;
-}
+}*/
 
 int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   char *filedic = file;
