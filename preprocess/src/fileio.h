@@ -9,13 +9,15 @@ currently synchronized io
 #include <shapelib-1.4.0/shapefil.h>
 #include <fast-csv-parser/csv.h>
 #include <jsoncpp-master/include/json/json.h>
-#include <bsoncxx/json.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
+//#include <bsoncxx/json.hpp>
+//#include <mongocxx/client.hpp>
+//#include <mongocxx/stdx.hpp>
+//#include <mongocxx/uri.hpp>
+//#include <mongocxx/instance.hpp>
 
-#include"geometry.h"
+#include "geometry.h"
+#include "polygon.h"
+#include "protectedarea.h"
 /*
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -58,7 +60,7 @@ int initCsv(void *file = nullptr) {
   }
 
   return 0;
-}*/
+}
 
 int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   char *filedic = file;
@@ -74,9 +76,9 @@ int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   }
   SHPClose(fileHandle);
   return 0;
-}
+}*/
 
-int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
+int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
   Json::Reader reader;
   Json::Value root;
 
@@ -86,10 +88,10 @@ int initJsonArea(vector<Polygon *> &areas, char *file = nullptr) {
     int file_size;
     if (!root["features"].isNull()) file_size = root["features"].size();
     for (int i = 0; i < file_size; i++){
-if (i!=894&&i!=1326&&i!=2295) continue;
       Json::Value coords = root["features"][i]["geometry"]["coordinates"];
       //std::cerr << root["features"][i]["properties"]["Category"].asString();
       int coords_size = coords.size();
+      ProtectedArea *area = new ProtectedArea();
       for (int k = 0; k < coords_size; k++){
         Polygon *polygon = new Polygon();
         Json::Value polys = coords[k];
@@ -102,15 +104,15 @@ if (i!=894&&i!=1326&&i!=2295) continue;
             polygon->addPoint(point);
           }    
         }
-        areas.push_back(polygon);
+        area->polygons.push_back(polygon);
       }
-      
+      areas.push_back(area);
     }
   }
   is.close();
   return 0;
 }
-
+/*
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);
   os.precision(17);
@@ -159,6 +161,6 @@ int txtArrayToJson(const char* file) {
   }
   os << "]";
   return 0;
-}
+}*/
 
 #endif

@@ -1,9 +1,10 @@
 #include <iostream>
-#include <fstream>
+#include <vector>
 #include <string>
-#include"fileio.h"
-#include"geometry.h"
 
+#include "dbio.h"
+#include "fileio.h"
+#include "protectedarea.h"
 using std::ifstream;
 using std::vector;
 
@@ -49,5 +50,6 @@ using std::vector;
   return 0;
 }*/
 int main(){
-  
+  vector<ProtectedArea *> areas;
+  return 0;
 }

@@ -69,6 +69,20 @@ struct Point_2d{
     return distanceEarth(p1.y + k*( p2.y - p1.y ), p1.x + k*( p2.x - p1.x ), y, x);
   }
 
+  int move(/*double lon, double lat,*/ double distMeter, double bearing){
+    double brngRad = deg2rad(bearing);
+    double lonRad = deg2rad(x);
+    double latRad = deg2rad(y);
+    double distFrac = distMeter / EARTHRADIUS;
+
+    double latitudeResult = asin(sin(latRad)*cos(distFrac) + cos(latRad)*sin(distFrac)*cos(brngRad));
+    double a = atan2(sin(brngRad)*sin(distFrac)*cos(latRad), cos(distFrac) - sin(latRad)*sin(latitudeResult));
+    double longitudeResult = lonRad + a + 3 * M_PI - ( 2 * M_PI )*floor(( lonRad + a + 3 * M_PI ) / ( 2 * M_PI )) - M_PI;
+    x = rad2deg(longitudeResult);
+    y = rad2deg(latitudeResult);
+    return 0;
+  }
+
   Point_2d getDistPoint(/*double lon, double lat,*/ double distMeter, double bearing){
     double brngRad = deg2rad(bearing);
     double lonRad = deg2rad(x);
