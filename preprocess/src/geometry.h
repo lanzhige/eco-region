@@ -2,7 +2,6 @@
 #define GEOMETRY_H_
 #include<iostream>
 #include<vector>
-//#include<unordered_map>
 #include<string>
 #include<math.h>
 
@@ -10,13 +9,35 @@
 
 using std::vector;
 
+double deg2rad(double deg) {
+  return ( deg * M_PI / 180 );
+}
+
+//  This function converts radians to decimal degrees
+double rad2deg(double rad) {
+  return ( rad * 180 / M_PI );
+}
+
+double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
+  double lat1r, lon1r, lat2r, lon2r, u, v;
+  lat1r = deg2rad(lat1d);
+  lon1r = deg2rad(lon1d);
+  lat2r = deg2rad(lat2d);
+  lon2r = deg2rad(lon2d);
+  u = sin(( lat2r - lat1r ) / 2.0);
+  v = sin(( lon2r - lon1r ) / 2.0);
+  return 2.0 * EARTHRADIUS*asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
+}
+
 struct Point_2d{
   double x;
   double y;
   Point_2d(double x, double y) :x(x), y(y){ }
   Point_2d(const Point_2d &ref) {
-    if (this == &ref) return;
-    Point_2d(ref.x, ref.y);
+    if (this != &ref) {
+      this->x = ref.x;
+      this->y = ref.y;
+    }
   }
 
   bool operator ==( const Point_2d &point ){
@@ -25,29 +46,10 @@ struct Point_2d{
   }
 
   Point_2d &operator = ( const Point_2d &point ){
-    if (this == &point) return;
-    this->x = point.x;
-    this->y = point.y;
-  }
-
-  double deg2rad(double deg)const {
-    return ( deg * M_PI / 180 );
-  }
-
-  //  This function converts radians to decimal degrees
-  double rad2deg(double rad) const{
-    return ( rad * 180 / M_PI );
-  }
-
-  double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) const{
-    double lat1r, lon1r, lat2r, lon2r, u, v;
-    lat1r = deg2rad(lat1d);
-    lon1r = deg2rad(lon1d);
-    lat2r = deg2rad(lat2d);
-    lon2r = deg2rad(lon2d);
-    u = sin(( lat2r - lat1r ) / 2);
-    v = sin(( lon2r - lon1r ) / 2);
-    return 2.0 * EARTHRADIUS * asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
+    if (this != &point) {
+      this->x = point.x;
+      this->y = point.y;
+    }
   }
 
   double dotProduct(const Point_2d &p1, const Point_2d &p2) const {
@@ -64,34 +66,45 @@ struct Point_2d{
     double dot2 = dotProduct(p2, p1);
     if (dot2 > 0) return distanceEarth(p1.y, p1.x, y, x);
 
-    double k = k = ( ( x - p1.x ) * ( p2.x - p1.x ) + ( y - p1.y ) * ( p2.y - p1.y ) )
-      / ( ( p2.x - p1.x ) * ( p2.x - p1.x ) + ( p2.y - p1.y ) * ( p2.y - p1.y ) );
-    return distanceEarth(p1.y + k*( p2.y - p1.y ), p1.x + k*( p2.x - p1.x ), y, x);
+    double k = k = ( ( x - p1.x ) * ( p2.x - p1.x ) 
+        + ( y - p1.y ) * ( p2.y - p1.y ) )
+        / ( ( p2.x - p1.x ) * ( p2.x - p1.x ) 
+        + ( p2.y - p1.y ) * ( p2.y - p1.y ) );
+    return distanceEarth(p1.y + k*( p2.y - p1.y ), p1.x + k*( p2.x - p1.x )
+        , y, x);
   }
 
   int move(/*double lon, double lat,*/ double distMeter, double bearing){
+    //std::cout<<"distance "<<distMeter<<" bearing "<<bearing<<std::endl;
     double brngRad = deg2rad(bearing);
     double lonRad = deg2rad(x);
     double latRad = deg2rad(y);
     double distFrac = distMeter / EARTHRADIUS;
 
-    double latitudeResult = asin(sin(latRad)*cos(distFrac) + cos(latRad)*sin(distFrac)*cos(brngRad));
-    double a = atan2(sin(brngRad)*sin(distFrac)*cos(latRad), cos(distFrac) - sin(latRad)*sin(latitudeResult));
-    double longitudeResult = lonRad + a + 3 * M_PI - ( 2 * M_PI )*floor(( lonRad + a + 3 * M_PI ) / ( 2 * M_PI )) - M_PI;
+    double latitudeResult = asin(sin(latRad)*cos(distFrac) 
+        + cos(latRad)*sin(distFrac)*cos(brngRad));
+    double a = atan2(sin(brngRad)*sin(distFrac)*cos(latRad)
+        , cos(distFrac) - sin(latRad)*sin(latitudeResult));
+    double longitudeResult = lonRad + a + 3 * M_PI 
+        - ( 2 * M_PI )*floor(( lonRad + a + 3 * M_PI ) / ( 2 * M_PI )) - M_PI;
     x = rad2deg(longitudeResult);
     y = rad2deg(latitudeResult);
+    //std::cout<<"x: "<<x<<" y: "<<std::endl;
     return 0;
   }
 
-  Point_2d getDistPoint(/*double lon, double lat,*/ double distMeter, double bearing){
+  Point_2d getDistPoint(double distMeter, double bearing){
     double brngRad = deg2rad(bearing);
     double lonRad = deg2rad(x);
     double latRad = deg2rad(y);
     double distFrac = distMeter / EARTHRADIUS;
 
-    double latitudeResult = asin(sin(latRad)*cos(distFrac) + cos(latRad)*sin(distFrac)*cos(brngRad));
-    double a = atan2(sin(brngRad)*sin(distFrac)*cos(latRad), cos(distFrac) - sin(latRad)*sin(latitudeResult));
-    double longitudeResult = lonRad + a + 3 * M_PI - ( 2 * M_PI )*floor(( lonRad + a + 3 * M_PI ) / ( 2 * M_PI )) - M_PI;
+    double latitudeResult = asin(sin(latRad)*cos(distFrac) 
+        + cos(latRad)*sin(distFrac)*cos(brngRad));
+    double a = atan2(sin(brngRad)*sin(distFrac)*cos(latRad)
+        , cos(distFrac) - sin(latRad)*sin(latitudeResult));
+    double longitudeResult = lonRad + a + 3 * M_PI 
+      - ( 2 * M_PI )*floor(( lonRad + a + 3 * M_PI ) / ( 2 * M_PI )) - M_PI;
     return ( Point_2d(rad2deg(longitudeResult), rad2deg(latitudeResult)) );
   }
 };
@@ -102,30 +115,45 @@ struct BoundingBox{
     origin = new Point_2d(MIN_LONGITUDE, MIN_LATITUDE);
     destination = new Point_2d(MAX_LONGITUDE, MAX_LATITUDE);
   }
-  BoundingBox(double left_lon, double bottom_lat, double right_lon, double top_lat){
+  BoundingBox(double left_lon, double bottom_lat
+      , double right_lon, double top_lat){
     origin = new Point_2d(left_lon, bottom_lat);
     destination = new Point_2d(right_lon, top_lat);
   }
 
   BoundingBox(const BoundingBox &bbox){
-    if (this == &bbox) return;
-    *origin = *( bbox.origin );
-    *destination = *( bbox.destination );
+    if (this != &bbox) {
+      origin->x = bbox.origin->x;
+      origin->y = bbox.origin->y;
+      destination->x = bbox.destination->x;
+      destination->y = bbox.destination->y;
+    }
   }
 
   BoundingBox &operator=( const BoundingBox &bbox ){
-    return BoundingBox(bbox);
+    if (this != &bbox){
+      origin->x = bbox.origin->x;
+      origin->y = bbox.origin->y;
+      destination->x = bbox.destination->x;
+      destination->y = bbox.destination->y;
+    }
+    return *this;
   }
 
   int setBoundary(const Point_2d &ori, const Point_2d &des){
-    *origin = ori;
-    *destination = des;
+    origin->x = ori.x;
+    origin->y = ori.y;
+    destination->x = des.x;
+    destination->y = des.y;
     return 0;
   }
 
   int extend(double boundary = MAX_THRES){
-    Point_2d new_origin = origin->getDistPoint(MAX_THRES, -90).getDistPoint(MAX_THRES, -180);
-    Point_2d new_destination = destination->getDistPoint(MAX_THRES, 90).getDistPoint(MAX_THRES, 0);
+    Point_2d new_origin = 
+        origin->getDistPoint(MAX_THRES, -180.0).getDistPoint(MAX_THRES, -90.0);
+    Point_2d new_destination 
+        = destination->getDistPoint(MAX_THRES, 0.0
+            ).getDistPoint(MAX_THRES, 90.0);
     setBoundary(new_origin, new_destination);
     return 0;
   }

@@ -15,7 +15,8 @@ struct Polygon{
   Polygon(const vector<Point_2d *> &ref) {
     coords.resize(ref.size());
     for (unsigned i = 0; i < coords.size(); i++){
-      *coords[i] = *ref[i];
+      coords[i]->x = ref[i]->x;
+      coords[i]->y = ref[i]->y;
     }
   }
 
@@ -25,7 +26,8 @@ struct Polygon{
 
       coords.push_back(new Point_2d(data[i - 1], data[i]));
     }
-    if (!( coords[coords.size() - 1] == coords[0] )) coords.emplace_back(coords[0]);
+    if (!( coords[coords.size() - 1] == coords[0] ))
+        coords.emplace_back(coords[0]);
     //link the last node to the first node
   }
 
@@ -34,7 +36,8 @@ struct Polygon{
     for (unsigned i = 0; i < size; i++) {
       coords.push_back(new Point_2d(data_x[i] / 10000, data_y[i] / 10000));
     }
-    if (!( coords[coords.size() - 1] == coords[0] )) coords.emplace_back(coords[0]);
+    if (!( coords[coords.size() - 1] == coords[0] )) 
+        coords.emplace_back(coords[0]);
     //link the last node to the first node
   }
 
@@ -45,9 +48,14 @@ struct Polygon{
   bool contain(const Point_2d &point) const {
     unsigned crossings = 0;
     for (unsigned int i = 1; i < coords.size(); i++){
-      bool cond1 = ( coords[i - 1]->x <= point.x ) && ( point.x < coords[i]->x );
-      bool cond2 = ( coords[i]->x <= point.x ) && ( point.x < coords[i - 1]->x );
-      bool above = ( point.y <= ( ( point.x - coords[i - 1]->x )*( coords[i]->y - coords[i - 1]->y ) / ( coords[i]->x - coords[i - 1]->x ) + coords[i - 1]->y ) );
+      bool cond1 = 
+          ( coords[i - 1]->x <= point.x ) && ( point.x < coords[i]->x );
+      bool cond2 = 
+          ( coords[i]->x <= point.x ) && ( point.x < coords[i - 1]->x );
+      bool above = 
+        ( point.y <= ( ( point.x - coords[i - 1]->x )
+            *( coords[i]->y - coords[i - 1]->y ) 
+        / ( coords[i]->x - coords[i - 1]->x ) + coords[i - 1]->y ) );
       // if the program crashes, probable the divider is zero
       if (( cond1 || cond2 ) && above) crossings++;
     }

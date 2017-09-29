@@ -89,9 +89,8 @@ int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
     if (!root["features"].isNull()) file_size = root["features"].size();
     for (int i = 0; i < file_size; i++){
       Json::Value coords = root["features"][i]["geometry"]["coordinates"];
-      //std::cerr << root["features"][i]["properties"]["Category"].asString();
       int coords_size = coords.size();
-      ProtectedArea *area = new ProtectedArea();
+      ProtectedArea *area = new ProtectedArea("MO"+std::to_string(i));
       for (int k = 0; k < coords_size; k++){
         Polygon *polygon = new Polygon();
         Json::Value polys = coords[k];
@@ -100,7 +99,8 @@ int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
           Json::Value pairs = polys[p];
           int pair_size = pairs.size();
           for (int q = 0; q < pair_size; q++){
-            Point_2d *point = new Point_2d(pairs[q][0].asDouble(), pairs[q][1].asDouble());
+            Point_2d *point = 
+                new Point_2d(pairs[q][0].asDouble(), pairs[q][1].asDouble());
             polygon->addPoint(point);
           }    
         }
