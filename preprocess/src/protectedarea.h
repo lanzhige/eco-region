@@ -19,7 +19,7 @@ struct Cell{
   Cell() :row_num(-1), col_num(-1){}
   Cell(int row, int col, double distance = MAX_DIST) :row_num(row), col_num(col), dist(distance){}
 };
-
+/*
 struct ProtectedArea{
   string name;
   vector<Polygon *> polygons;
@@ -68,14 +68,14 @@ struct ProtectedArea{
     //std::cout<<"des x: "<<destination.x<<"des y: " <<destination.y<<std::endl;
     //find the row num and col num for each cell
     double row_start, row_end, col_start, col_end;
-    /*row_start = distanceEarth(origin.y, origin.x, MIN_LATITUDE, origin.x) / 30;
+    /row_start = distanceEarth(origin.y, origin.x, MIN_LATITUDE, origin.x) / 30;
     row_end = distanceEarth(destination.y, destination.x
         , MIN_LATITUDE, destination.x) / 30 + 1;
     col_start = distanceEarth(origin.y, origin.x, origin.y, MIN_LONGITUDE) / 30;
     col_end = distanceEarth(destination.y, destination.x
         , destination.y, MIN_LONGITUDE) / 30 + 1;
     std::cout<<"origin.y"<<origin.y<<" origin.x:"<<origin.x<<std::endl;
-    std::cout<<MIN_LATITUDE<<std::endl;*/
+    std::cout<<MIN_LATITUDE<<std::endl;/
     row_start = distanceEarth(origin.y, MIN_LONGITUDE
         , MIN_LATITUDE, MIN_LONGITUDE) / 30;
     row_end = distanceEarth(destination.y, MIN_LONGITUDE
@@ -127,5 +127,39 @@ struct ProtectedArea{
     return 0;
   }
 };
+*/
+struct ProtectedArea{
+  string name;
+  Polygon *polygon_;
+  vector<Cell *> cells;
 
+  ProtectedArea(){
+    name="";
+    polygon=nullptr;
+    cells.clear();
+  }
+
+  ProtectedArea(const string &name, Polygon *polygon){
+    this->name = name;
+    this->polygon = polygon;
+  }
+
+  int genBoundingBox(){
+    if (!polygon||polygon->coords.size()==0) return 0;
+    polygon->resizeBoundingBox();
+    int lower_x = static_cast<int>(polygon->bbox.origin->x/30);
+    int upper_x = static_cast<int>(polygon->bbox.destination->x/30)+2;
+    int lower_y = static_cast<int>(polygon->bbox.origin->y/30);
+    int upper_y = static_cast<int>(polygon->bbox.destination->y/30)+2;
+    int size = (upper_x-lower_x)*(upper_y-lower_y);
+    cells.resize(size);
+    int count = 0;
+    for (int i=lower_x;i<upper_x;i++){
+      for (int j=lower_y;j<upper_y;j++){
+        
+      }
+    }
+    return 0;
+  }
+};
 #endif
