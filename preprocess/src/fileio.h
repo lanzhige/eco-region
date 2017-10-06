@@ -61,7 +61,7 @@ int initCsv(void *file = nullptr) {
 
   return 0;
 }
-
+*/
 int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   char *filedic = file;
   // the file directory is to be input
@@ -72,12 +72,15 @@ int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   SHPGetInfo(fileHandle, &pnEntities, &pnShapeType, nullptr, nullptr);
   for (unsigned i = 0; i < pnEntities; i++){
     SHPObject *shpObj = SHPReadObject(fileHandle, i);
-    areas.emplace_back(new Polygon(shpObj->padfX, shpObj->padfY, shpObj->nVertices));
+    std::cout<< *(shpObj->padfX)<<" "<<*(shpObj->padfY)<<std::endl;
+    areas.push_back(
+        new Polygon(shpObj->padfX, shpObj->padfY, shpObj->nVertices)
+        );
   }
   SHPClose(fileHandle);
   return 0;
-}*/
-
+}
+/*
 int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
   Json::Reader reader;
   Json::Value root;
@@ -111,7 +114,7 @@ int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
   }
   is.close();
   return 0;
-}
+}*/
 /*
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);

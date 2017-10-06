@@ -52,16 +52,27 @@ using std::vector;
 }*/
 int main(){
   vector<ProtectedArea *> areas;
-  initJsonArea(areas
-      , "/home/lzhan253/project/eco-region/preprocess/data/test.json");
+  vector<Polygon *> area;
+  //initJsonArea(areas
+  //    , "/home/lzhan253/project/eco-region/preprocess/data/test.json");
+  initProtectedArea(area
+      , "/home/lzhan253/project/eco-region/preprocess/data/MO.shp");
   std::cout<<"protected area json input finished!"<<std::endl;
-  std::cout<<"total protected areas: "<<areas.size()<<std::endl;
+  std::cout<<"total protected areas: "<<area.size()<<std::endl;
+  int k;
+  std::cin>>k;
+  while (k>=0){
+    for (int i=0;i<area[k]->coords.size();i++){
+      std::cout<<area[k]->coords[i]->x<<" "<<area[k]->coords[i]->y<<std::endl;
+    }
+    std::cin>>k;
+  }
   //Point_2d p(-93.1076, 37.8306);
   //p.move(300000.0, -90.0);
   //std::cout<<"p x: "<<p.x<<" py: "<<p.y<<std::endl;
   //std::cout<<"distance: "<<distanceEarth(p.y,p.x,37.8306, -93.1076);
   
-  for (int i=0;i<2;i++){
+  /*for (int i=0;i<2;i++){
     areas[i]->genBoundingBox();
     std::cout<<areas[i]->polygons.size()<<std::endl;
   }
@@ -72,6 +83,6 @@ int main(){
   mongodb.insertDB(areas[0]);
   mongodb.insertDB(areas[1]);
   std::cout<<"data insert finished"<<std::endl;
-  
+  */
   return 0;
 }

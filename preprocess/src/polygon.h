@@ -34,15 +34,11 @@ struct Polygon{
   Polygon(double *data_x, double *data_y, unsigned int size) {
     //construct from a list of x and y
     for (unsigned i = 0; i < size; i++) {
-      coords.push_back(new Point_2d(data_x[i] / 10000, data_y[i] / 10000));
+      coords.push_back(new Point_2d(data_x[i], data_y[i]));
     }
     if (!( coords[coords.size() - 1] == coords[0] )) 
         coords.emplace_back(coords[0]);
     //link the last node to the first node
-  }
-
-  void addPoint(Point_2d *p) {
-    coords.push_back(p);
   }
 
   bool contain(const Point_2d &point) const {
