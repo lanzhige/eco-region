@@ -5,7 +5,7 @@
 #include "dbio.h"
 #include "fileio.h"
 #include "protectedarea.h"
-#include "dbio.h"
+
 using std::ifstream;
 using std::vector;
 
@@ -51,15 +51,34 @@ using std::vector;
   return 0;
 }*/
 int main(){
-  vector<Polygon *> areas;
+  vector<ProtectedArea *> areas;
   //initJsonArea(areas
   //    , "/home/lzhan253/project/eco-region/preprocess/data/test.json");
-  initProtectedArea(area
+  initProtectedArea(areas
       , "/home/lzhan253/project/eco-region/preprocess/data/MO.shp");
   std::cout<<"protected area json input finished!"<<std::endl;
-  std::cout<<"total protected areas: "<<area.size()<<std::endl;
-  for (int i=0;i<areas.size();i++) areas[i]->resizeBoundingBox();
-  
+  std::cout<<"total protected areas: "<<areas.size()<<std::endl;
+  for (int i=0;i<areas[0]->polygons[0]->coords.size();i++)
+    std::cout<<"x: "<<areas[0]->polygons[0]->coords[i]->x
+        <<" y: "<<areas[0]->polygons[0]->coords[i]->y<<std::endl;
+  for (int i=0;i<areas[0]->polygons[1]->coords.size();i++)
+    std::cout<<"x: "<<areas[0]->polygons[1]->coords[i]->x
+        <<" y: "<<areas[0]->polygons[1]->coords[i]->y<<std::endl;
+
+  /*areas[1]->genBoundingBox();
+  std::cout<<"cell size"<<areas[1]->cells.size()<<std::endl;
+  for (int i=0;i<areas[1]->cells.size();i++){
+    if (i>20) break;
+    std::cout<<"dist: "<<areas[1]->cells[i]->dist<<std::endl;
+  }*/
+  DBio db;
+  db.initMongo();
+
+  for (int i=0;i<10;i++){
+    areas[i]->genBoundingBox();
+    db.insertDB(areas[i]);
+    delete areas[i];
+  }
 
   //Point_2d p(-93.1076, 37.8306);
   //p.move(300000.0, -90.0);

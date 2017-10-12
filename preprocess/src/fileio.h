@@ -61,7 +61,7 @@ int initCsv(void *file = nullptr) {
 
   return 0;
 }
-*/
+
 int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   char *filedic = file;
   // the file directory is to be input
@@ -80,6 +80,43 @@ int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
   SHPClose(fileHandle);
   return 0;
 }
+*/
+
+int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
+  char *filedic = file;
+  // the file directory is to be input
+  SHPHandle fileHandle = SHPOpen(filedic, "rb");
+  if (fileHandle == nullptr) return 1;
+  int pnEntities, pnShapeType;
+  double *padfMinBound, *padMaxBound;
+  SHPGetInfo(fileHandle, &pnEntities, &pnShapeType, nullptr, nullptr);
+  for (unsigned i = 0; i < pnEntities; i++){
+    SHPObject *shpObj = SHPReadObject(fileHandle, i);
+    /*if (i==0) {
+      std::cout<<"parts: "<<shpObj->nParts<<std::endl;
+      for (int j=0;j<shpObj->nParts;j++){
+        std::cout<<"part: "<<j<<" start index: "<<shpObj->panPartStart[j]<<" part type: "<<shpObj->panPartType[j]<<std::endl;
+      }
+    }*/
+    ProtectedArea *area = new ProtectedArea("MO"+std::to_string(i));
+    for (unsigned j=1;j<shpObj->nParts;j++){
+      area->polygons.push_back(
+          new Polygon(shpObj->padfX+shpObj->panPartStart[j-1]
+              , shpObj->padfY+shpObj->panPartStart[j-1]
+              , shpObj->panPartStart[j]-shpObj->panPartStart[j-1])
+      );
+    }
+    area->polygons.push_back(
+        new Polygon(shpObj->padfX+shpObj->panPartStart[shpObj->nParts-1]
+            , shpObj->padfY+shpObj->panPartStart[shpObj->nParts-1]
+            , shpObj->nVertices-shpObj->panPartStart[shpObj->nParts-1])
+    );
+    areas.push_back(area);
+  }
+  SHPClose(fileHandle);
+  return 0;
+}
+
 /*
 int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
   Json::Reader reader;

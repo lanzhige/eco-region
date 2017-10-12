@@ -46,6 +46,7 @@ public:
 
   int insertDB(const ProtectedArea *pa, string collection_name = "test") {
     mongocxx::collection coll = db[collection_name];
+    for (int sp=0; sp<pa->cells.size();sp+=100000){
     auto builder = bsoncxx::builder::stream::document();
     //builder
     //  <<"name"<<pa->name;
@@ -64,7 +65,47 @@ public:
     //builder<<"polygons"<<in_array;
     // <<"cells"<<bsoncxx::builder::stream::open_array;
     auto after_array = array();
-    for (int i=0;i<pa->cells.size()/10000;i++){
+    for (int i=sp;i<pa->cells.size()&&i<sp+100000;i++){
+      after_array<<bsoncxx::builder::stream::open_document
+        <<"row"<<pa->cells[i]->row_num
+        <<"col"<<pa->cells[i]->col_num
+        <<"dist"<<pa->cells[i]->dist
+        <<bsoncxx::builder::stream::close_document;
+    }
+    //builder<<"cells"<<after_array
+    //    <<bsoncxx::builder::stream::finalize;    
+    bsoncxx::document::value doc_value = builder
+        <<"name"<<pa->name
+        <<"polygons"<<in_array
+        <<"cells"<<after_array
+        <<bsoncxx::builder::stream::finalize;
+    //    in_array<<bsoncxx::builder::stream::finalize;
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
+      coll.insert_one(doc_value.view());
+    }
+  }
+
+/*  int insertDB(const ProtectedArea *pa, string collection_name = "test") {
+    mongocxx::collection coll = db[collection_name];
+    auto builder = bsoncxx::builder::stream::document();
+    //builder
+    //  <<"name"<<pa->name;
+    //  <<bsoncxx::builder::stream::finalize;
+    auto in_array = bsoncxx::builder::stream::array();
+    for (int i=0;i<pa->polygons.size();i++){
+      in_array<<bsoncxx::builder::stream::open_array;
+      for (int j=0;j<pa->polygons[i]->coords.size();j++){
+        in_array<<bsoncxx::builder::stream::open_array
+          <<pa->polygons[i]->coords[j]->x
+          <<pa->polygons[i]->coords[j]->y
+          <<bsoncxx::builder::stream::close_array;
+      }
+      in_array<<close_array;
+    }
+    //builder<<"polygons"<<in_array;
+    // <<"cells"<<bsoncxx::builder::stream::open_array;
+    auto after_array = array();
+    for (int i=0;i<pa->cells.size();i++){
       after_array<<bsoncxx::builder::stream::open_document
         <<"row"<<pa->cells[i]->row_num
         <<"col"<<pa->cells[i]->col_num
@@ -82,8 +123,7 @@ public:
     bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
       coll.insert_one(doc_value.view());
   }
-
-
+*/
   int dbload(string collection_name = "test"){
   //mongocxx::instance instance{};
     mongocxx::collection coll = db[collection_name];

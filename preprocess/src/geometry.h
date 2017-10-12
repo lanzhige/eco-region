@@ -18,6 +18,7 @@ double rad2deg(double rad) {
   return ( rad * 180 / M_PI );
 }
 
+/*
 double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
   double lat1r, lon1r, lat2r, lon2r, u, v;
   lat1r = deg2rad(lat1d);
@@ -27,6 +28,10 @@ double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
   u = sin(( lat2r - lat1r ) / 2.0);
   v = sin(( lon2r - lon1r ) / 2.0);
   return 2.0 * EARTHRADIUS*asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
+}*/
+
+double distanceEarth(double y1, double x1, double y2, double x2){
+  return sqrt((y1-y2)*(y1-y2)+(x1-x2)*(x1-x2));
 }
 
 struct Point_2d{
@@ -148,7 +153,7 @@ struct BoundingBox{
     return 0;
   }
 
-  int extend(double boundary = MAX_THRES){
+  /*int extend(double boundary = MAX_THRES){
     Point_2d new_origin = 
         origin->getDistPoint(MAX_THRES, -180.0).getDistPoint(MAX_THRES, -90.0);
     Point_2d new_destination 
@@ -156,6 +161,12 @@ struct BoundingBox{
             ).getDistPoint(MAX_THRES, 90.0);
     setBoundary(new_origin, new_destination);
     return 0;
+  }*/
+  int extend(){
+    this->origin->x -= MAX_THRES;
+    this->origin->y -= MAX_THRES;
+    this->destination->x += MAX_THRES;
+    this->destination->y += MAX_THRES;
   }
 
   ~BoundingBox(){

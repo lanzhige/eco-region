@@ -130,36 +130,84 @@ struct ProtectedArea{
 */
 struct ProtectedArea{
   string name;
-  Polygon *polygon_;
+  vector<Polygon *> polygons;
   vector<Cell *> cells;
 
   ProtectedArea(){
     name="";
-    polygon=nullptr;
+    polygons.clear();
     cells.clear();
   }
 
-  ProtectedArea(const string &name, Polygon *polygon){
+  ProtectedArea(const string &name){
+    ProtectedArea();
     this->name = name;
-    this->polygon = polygon;
   }
 
   int genBoundingBox(){
-    if (!polygon||polygon->coords.size()==0) return 0;
-    polygon->resizeBoundingBox();
-    int lower_x = static_cast<int>(polygon->bbox.origin->x/30);
-    int upper_x = static_cast<int>(polygon->bbox.destination->x/30)+2;
-    int lower_y = static_cast<int>(polygon->bbox.origin->y/30);
-    int upper_y = static_cast<int>(polygon->bbox.destination->y/30)+2;
+    if (polygons.size() == 0) return 0;
+    for (unsigned i = 0; i < polygons.size(); i++){
+      polygons[i]->resizeBoundingBox();
+    }
+    
+    Point_2d origin(*polygons[0]->bbox.origin);
+    Point_2d destination(*polygons[0]->bbox.destination);
+    
+    for (unsigned i = 0; i < polygons.size(); i++){
+     //calculate the bounding box of all the polygons in a protected area
+      if (polygons[i]->bbox.origin->x<origin.x) 
+        origin.x = polygons[i]->bbox.origin->x;
+      if (polygons[i]->bbox.origin->y<origin.y)
+        origin.y = polygons[i]->bbox.origin->y;
+      if (polygons[i]->bbox.destination->x>destination.x)
+        destination.x = polygons[i]->bbox.destination->x;
+      if (polygons[i]->bbox.destination->y>destination.y)
+        destination.y = polygons[i]->bbox.destination->y;
+    }
+    std::cout<<origin.x<<" "<<origin.y<<std::endl;
+    std::cout<<destination.x<<" "<<destination.y<<std::endl;
+
+    int lower_x = static_cast<int>(origin.x/30);
+    int upper_x = static_cast<int>(destination.x/30)+2;
+    int lower_y = static_cast<int>(origin.y/30);
+    int upper_y = static_cast<int>(destination.y/30)+2;
     int size = (upper_x-lower_x)*(upper_y-lower_y);
     cells.resize(size);
     int count = 0;
     for (int i=lower_x;i<upper_x;i++){
       for (int j=lower_y;j<upper_y;j++){
-        
+        Point_2d p(i*30+15, j*30+15);
+        double dist=MAX_DIST;
+        for (int k=0;k<polygons.size();k++){
+          if (polygons[k]->contain(p)){
+            dist = -1.0;
+            break;
+          } else{
+            double distant = polygons[k]->shortestDistance(p);
+            if (distant<dist) dist = distant;
+          }
+        }
+        if (dist<MAX_THRES) {
+          cells[count] = new Cell(i, j, dist);
+          count++;
+        }
       }
     }
+    cells.resize(count);
     return 0;
+  }
+
+  ~ProtectedArea(){
+    if (cells.size()>0){
+      for (int i=0;i<cells.size();i++)
+        delete cells[i];
+    }
+    cells.clear();
+    if (polygons.size()>0){
+      for (int i=0;i<cells.size();i++)
+        delete polygons[i];
+    }
+    polygons.clear();
   }
 };
 #endif

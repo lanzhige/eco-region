@@ -79,5 +79,13 @@ struct Polygon{
     bbox.extend();
     return 0;
   }
+
+  ~Polygon(){
+    if (coords.size()>0)
+      for (int i=0;i<coords.size();i++){
+        delete coords[i];
+      }
+    coords.clear();
+  }
 };
 #endif
