@@ -117,8 +117,8 @@ int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
   return 0;
 }
 
-/*
-int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
+
+int initJsonArea(vector<ProtectedArea *> &areas,const char *file = nullptr) {
   Json::Reader reader;
   Json::Value root;
 
@@ -128,22 +128,21 @@ int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
     int file_size;
     if (!root["features"].isNull()) file_size = root["features"].size();
     for (int i = 0; i < file_size; i++){
-      Json::Value coords = root["features"][i]["geometry"]["coordinates"];
+      Json::Value coords = root["features"][i]["geometry"]["rings"];
       int coords_size = coords.size();
-      ProtectedArea *area = new ProtectedArea("MO"+std::to_string(i));
+      ProtectedArea *area = new ProtectedArea("WA"+std::to_string(i));
       for (int k = 0; k < coords_size; k++){
         Polygon *polygon = new Polygon();
         Json::Value polys = coords[k];
         int poly_size = polys.size();
-        for (int p = 0; p < poly_size; p++){
-          Json::Value pairs = polys[p];
-          int pair_size = pairs.size();
-          for (int q = 0; q < pair_size; q++){
-            Point_2d *point = 
-                new Point_2d(pairs[q][0].asDouble(), pairs[q][1].asDouble());
-            polygon->addPoint(point);
-          }    
-        }
+        //for (int p = 0; p < poly_size; p++){
+        //  Json::Value pairs = polys[p];
+        //  int pair_size = pairs.size();
+        for (int q = 0; q < poly_size; q++){
+          Point_2d *point = 
+              new Point_2d(polys[q][0].asDouble(), polys[q][1].asDouble());
+          polygon->addPoint(point);
+        }    
         area->polygons.push_back(polygon);
       }
       areas.push_back(area);
@@ -151,7 +150,7 @@ int initJsonArea(vector<ProtectedArea *> &areas, char *file = nullptr) {
   }
   is.close();
   return 0;
-}*/
+}
 /*
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);

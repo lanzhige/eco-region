@@ -41,6 +41,10 @@ struct Polygon{
     //link the last node to the first node
   }
 
+  void addPoint(Point_2d *p){
+    coords.push_back(p);
+  }
+
   bool contain(const Point_2d &point) const {
     unsigned crossings = 0;
     for (unsigned int i = 1; i < coords.size(); i++){

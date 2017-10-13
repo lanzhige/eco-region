@@ -10,7 +10,11 @@
 #include <mongocxx/stdx.hpp>
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
+#include <jsoncpp-master/include/json/json.h>
+
+#include "geometry.h"
 #include "protectedarea.h"
+
 using std::vector;
 using std::string;
 
@@ -42,6 +46,7 @@ public:
     uri = new mongocxx::uri("mongodb://localhost:27017");
     client = new mongocxx::client(*uri);
     db = (*client)["eco_region"];
+    return 0;
   }
 
   int insertDB(const ProtectedArea *pa, string collection_name = "test") {
@@ -83,6 +88,7 @@ public:
     bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
       coll.insert_one(doc_value.view());
     }
+    return 0;
   }
 
 /*  int insertDB(const ProtectedArea *pa, string collection_name = "test") {
@@ -124,25 +130,72 @@ public:
       coll.insert_one(doc_value.view());
   }
 */
+
+  int dbfind(vector<ProtectedArea *> &areas,
+      string syntax = "{}", string collection_name = "test"){
+    mongocxx::collection coll = db[collection_name];
+    mongocxx::cursor cursor = coll.find(document{} << finalize);
+    vector<bsoncxx::document::value> documents;
+    for (auto doc : cursor) {
+      Json::Reader reader;
+      Json::Value root;
+
+      string s(bsoncxx::to_json(doc));
+      string out_str("");
+
+      if (reader.parse(s,root)) {
+        double x=
+          root["properties"]["center"]["geometry"]["coordinates"][0].asDouble();
+        double y=
+          root["properties"]["center"]["geometry"]["coordinates"][1].asDouble();
+        Point_2d p(x,y);
+        double dist = MAX_DIST;
+        for (int i=0;i<areas.size();i++){
+          if (dist == -1) break;
+          if (!areas[i]->insidePA(p)) continue;
+          for (int j=0;j<areas[i]->polygons.size();j++){
+            if (areas[i]->polygons[j]->contain(p)) {
+              dist = -1;
+              break;
+            }
+            double st = areas[i]->polygons[j]->shortestDistance(p);
+            if (st<dist) dist = st;
+          }
+        }
+        if (dist<=MAX_THRES) {
+          Json::StyledWriter writer;
+          root["properties"]["center"]["properties"]=dist;
+          out_str = writer.write(root);
+          documents.push_back(
+              bsoncxx::document::value(bsoncxx::from_json(out_str))
+              );
+        }
+      }
+    }
+    mongocxx::collection coll_out = db["test1"];
+    coll_out.insert_many(documents);
+    return 0;
+  }
+
   int dbload(string collection_name = "test"){
   //mongocxx::instance instance{};
     mongocxx::collection coll = db[collection_name];
     auto builder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value doc_value = builder
-    << "name" << "MongoDB"
-    << "type" << "database"
-    << "count" << 1
-    << "versions" << bsoncxx::builder::stream::open_array
-    << "v3.2" << "v3.0" << "v2.6"
-    << close_array
-    << "info" << bsoncxx::builder::stream::open_document
-    << "x" << 203
-    << "y" << 102
-    << bsoncxx::builder::stream::close_document
-    << bsoncxx::builder::stream::finalize;
-  bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
-    coll.insert_one(doc_value.view());
-  return 0;
-}
+      << "name" << "MongoDB"
+      << "type" << "database"
+      << "count" << 1
+      << "versions" << bsoncxx::builder::stream::open_array
+      << "v3.2" << "v3.0" << "v2.6"
+      << close_array
+      << "info" << bsoncxx::builder::stream::open_document
+      << "x" << 203
+      << "y" << 102
+      << bsoncxx::builder::stream::close_document
+      << bsoncxx::builder::stream::finalize;
+    bsoncxx::stdx::optional<mongocxx::result::insert_one> result =
+      coll.insert_one(doc_value.view());
+    return 0;
+  }
 };
 #endif

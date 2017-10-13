@@ -18,7 +18,6 @@ double rad2deg(double rad) {
   return ( rad * 180 / M_PI );
 }
 
-/*
 double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
   double lat1r, lon1r, lat2r, lon2r, u, v;
   lat1r = deg2rad(lat1d);
@@ -28,11 +27,11 @@ double distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d) {
   u = sin(( lat2r - lat1r ) / 2.0);
   v = sin(( lon2r - lon1r ) / 2.0);
   return 2.0 * EARTHRADIUS*asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
-}*/
-
-double distanceEarth(double y1, double x1, double y2, double x2){
-  return sqrt((y1-y2)*(y1-y2)+(x1-x2)*(x1-x2));
 }
+
+/*double distanceEarth(double y1, double x1, double y2, double x2){
+  return sqrt((y1-y2)*(y1-y2)+(x1-x2)*(x1-x2));
+}*/
 
 struct Point_2d{
   double x;
@@ -163,10 +162,10 @@ struct BoundingBox{
     return 0;
   }*/
   int extend(){
-    this->origin->x -= MAX_THRES;
-    this->origin->y -= MAX_THRES;
-    this->destination->x += MAX_THRES;
-    this->destination->y += MAX_THRES;
+    this->origin->x -= 0.5;
+    this->origin->y -= 0.2;
+    this->destination->x += 0.5;
+    this->destination->y += 0.2;
   }
 
   ~BoundingBox(){
