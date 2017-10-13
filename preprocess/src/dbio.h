@@ -164,7 +164,7 @@ public:
         }
         if (dist<=MAX_THRES) {
           Json::StyledWriter writer;
-          root["properties"]["center"]["properties"]=dist;
+          root["properties"]["dist"]=dist;
           out_str = writer.write(root);
           documents.push_back(
               bsoncxx::document::value(bsoncxx::from_json(out_str))
