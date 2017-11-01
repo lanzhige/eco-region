@@ -6,9 +6,7 @@ currently synchronized io
 #define FILEIO_H_
 #include <iostream>
 #include <fstream>
-#include <shapelib-1.4.0/shapefil.h>
-#include <fast-csv-parser/csv.h>
-#include <jsoncpp-master/include/json/json.h>
+#include <json/json.h>
 //#include <bsoncxx/json.hpp>
 //#include <mongocxx/client.hpp>
 //#include <mongocxx/stdx.hpp>
@@ -82,7 +80,7 @@ int initProtectedArea(vector<Polygon *> &areas, char *file = nullptr){
 }
 */
 
-int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
+/*int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
   char *filedic = file;
   // the file directory is to be input
   SHPHandle fileHandle = SHPOpen(filedic, "rb");
@@ -92,12 +90,12 @@ int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
   SHPGetInfo(fileHandle, &pnEntities, &pnShapeType, nullptr, nullptr);
   for (unsigned i = 0; i < pnEntities; i++){
     SHPObject *shpObj = SHPReadObject(fileHandle, i);
-    /*if (i==0) {
+    if (i==0) {
       std::cout<<"parts: "<<shpObj->nParts<<std::endl;
       for (int j=0;j<shpObj->nParts;j++){
         std::cout<<"part: "<<j<<" start index: "<<shpObj->panPartStart[j]<<" part type: "<<shpObj->panPartType[j]<<std::endl;
       }
-    }*/
+    }
     ProtectedArea *area = new ProtectedArea("MO"+std::to_string(i));
     for (unsigned j=1;j<shpObj->nParts;j++){
       area->polygons.push_back(
@@ -115,7 +113,7 @@ int initProtectedArea(vector<ProtectedArea *> &areas, char *file = nullptr){
   }
   SHPClose(fileHandle);
   return 0;
-}
+}*/
 
 
 int initJsonArea(vector<ProtectedArea *> &areas,const char *file = nullptr) {

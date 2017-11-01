@@ -227,10 +227,10 @@ struct ProtectedArea{
     return 0;
   }
 
-  bool insidePA(Point_2d &p){
+  bool insidePA(Point_2d *p){
     if (bbox==nullptr) return false;
-    if (bbox->origin->x<p.x&&bbox->destination->x>p.x
-        &&bbox->origin->y<p.y&&bbox->destination->y>p.y) return true;
+    if (bbox->origin->x<p->x&&bbox->destination->x>p->x
+        &&bbox->origin->y<p->y&&bbox->destination->y>p->y) return true;
     return false;
   }
 

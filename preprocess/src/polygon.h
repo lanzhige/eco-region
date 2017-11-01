@@ -23,12 +23,11 @@ struct Polygon{
   Polygon(double *data, unsigned int size) {
     //construction: read data as a list of  x0, y0, x1, y1, etc
     for (unsigned int i = 1; i < size; i = i + 2) {
-
       coords.push_back(new Point_2d(data[i - 1], data[i]));
     }
     if (!( coords[coords.size() - 1] == coords[0] ))
-        coords.emplace_back(coords[0]);
-    //link the last node to the first node
+        coords.push_back(coords[0]);
+    //link the last node to the first node, might should be replaced by emplace_back
   }
 
   Polygon(double *data_x, double *data_y, unsigned int size) {
@@ -62,11 +61,10 @@ struct Polygon{
     if (crossings % 2 == 0) return false; else return true;
   }
 
-  double shortestDistance(const Point_2d &point) const {
-    double min_dist = MAX_DIST, dist;
+  double shortestDistance(Point_2d *point) const {
+    double min_dist = MAX_DIST;
     for (unsigned i = 1; i < coords.size(); i++) {
-      dist = point.toSegDist(*coords[i - 1], *coords[i]);
-      if (dist < min_dist) min_dist = dist;
+	  min_dist = std::min(min_dist, point->toSegDist(coords[i - 1], coords[i]));
     }
     return min_dist;
   }
@@ -85,6 +83,7 @@ struct Polygon{
   }
 
   ~Polygon(){
+	  std::cout << "destructing Polygon" << std::endl;
     if (coords.size()>0)
       for (int i=0;i<coords.size();i++){
         delete coords[i];

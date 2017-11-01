@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /* #undef BSONCXX_POLY_USE_STD_EXPERIMENTAL */
-#define BSONCXX_POLY_USE_MNMLSTC
+/* #undef BSONCXX_POLY_USE_MNMLSTC */
 /* #undef BSONCXX_POLY_USE_SYSTEM_MNMLSTC */
-/* #undef BSONCXX_POLY_USE_BOOST */
+#define BSONCXX_POLY_USE_BOOST
 
 #define BSONCXX_INLINE_NAMESPACE_BEGIN inline namespace v_noabi {
 

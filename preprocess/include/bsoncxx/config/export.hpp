@@ -9,20 +9,20 @@
 #  ifndef BSONCXX_API
 #    ifdef BSONCXX_EXPORT
         /* We are building this library */
-#      define BSONCXX_API __attribute__((visibility("default")))
+#      define BSONCXX_API __declspec(dllexport)
 #    else
         /* We are using this library */
-#      define BSONCXX_API __attribute__((visibility("default")))
+#      define BSONCXX_API __declspec(dllimport)
 #    endif
 #  endif
 
 #  ifndef BSONCXX_PRIVATE
-#    define BSONCXX_PRIVATE __attribute__((visibility("hidden")))
+#    define BSONCXX_PRIVATE 
 #  endif
 #endif
 
 #ifndef BSONCXX_DEPRECATED
-#  define BSONCXX_DEPRECATED __attribute__ ((__deprecated__))
+#  define BSONCXX_DEPRECATED __declspec(deprecated)
 #endif
 
 #ifndef BSONCXX_DEPRECATED_EXPORT
@@ -33,9 +33,10 @@
 #  define BSONCXX_DEPRECATED_NO_EXPORT BSONCXX_PRIVATE BSONCXX_DEPRECATED
 #endif
 
-#define DEFINE_NO_DEPRECATED 0
-#if DEFINE_NO_DEPRECATED
-# define BSONCXX_NO_DEPRECATED
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef BSONCXX_NO_DEPRECATED
+#    define BSONCXX_NO_DEPRECATED
+#  endif
 #endif
 
 #endif

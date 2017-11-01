@@ -56,7 +56,7 @@ struct Point_2d{
     }
   }
 
-  double dotProduct(const Point_2d &p1, const Point_2d &p2) const {
+  /*double dotProduct(const Point_2d &p1, const Point_2d &p2) const {
     return ( p2.x - p1.x )*( x - p2.x ) + ( p2.y - p1.y )*( y - p2.y );
   }
 
@@ -72,14 +72,45 @@ struct Point_2d{
 
     double k = k = ( ( x - p1.x ) * ( p2.x - p1.x ) 
         + ( y - p1.y ) * ( p2.y - p1.y ) )
-        / ( ( p2.x - p1.x ) * ( p2.x - p1.x ) 
-        + ( p2.y - p1.y ) * ( p2.y - p1.y ) );
+        / ((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
     return distanceEarth(p1.y + k*( p2.y - p1.y ), p1.x + k*( p2.x - p1.x )
         , y, x);
+  }*/
+
+  double dotProduct(const Point_2d *p1, const Point_2d *p2) const {
+	  return (p2->x - p1->x)*(x - p2->x) + (p2->y - p1->y)*(y - p2->y);
   }
 
-  int move(/*double lon, double lat,*/ double distMeter, double bearing){
-    //std::cout<<"distance "<<distMeter<<" bearing "<<bearing<<std::endl;
+  double crossProduct(const Point_2d *p1, const Point_2d *p2) const {
+	  return (p2->x - p1->x)*(y - p1->y) - (p2->y - p1->y)*(x - p1->x);
+  }
+
+  double toSegDist(const Point_2d *p1, const Point_2d *p2)const {
+	  // maybe I can record the result of p2->x - p1->x 
+	  // and p2->y - p1->y to reduce a constant calculation
+	  double dot1 = dotProduct(p1, p2);
+	  if (dot1 > 0) return distanceEarth(p2->y, p2->x, y, x);
+	  double dot2 = dotProduct(p2, p1);
+	  if (dot2 > 0) return distanceEarth(p1->y, p1->x, y, x);
+
+	  /*double k1 = ((p2->x - p1->x) * (p2->x - p1->x)
+		+ (p2->y - p1->y) * (p2->y - p1->y));
+	  if (k1 < BIAS) {
+		  std::cout << "smaller than 1e-17: " << k1 << std::endl;
+		  return distanceEarth(p1->y, p1->x, y, x);
+	  }*/
+
+	  double k = k = ((x - p1->x) * (p2->x - p1->x)
+		  + (y - p1->y) * (p2->y - p1->y))
+		  / (
+				(p2->x - p1->x) * (p2->x - p1->x) 
+			  + (p2->y - p1->y) * (p2->y - p1->y)
+			  );
+	  return distanceEarth(p1->y + k*(p2->y - p1->y)
+		  , p1->x + k*(p2->x - p1->x), y, x);
+  }
+
+  int move(double distMeter, double bearing){
     double brngRad = deg2rad(bearing);
     double lonRad = deg2rad(x);
     double latRad = deg2rad(y);
@@ -161,14 +192,17 @@ struct BoundingBox{
     setBoundary(new_origin, new_destination);
     return 0;
   }*/
+
   int extend(){
-    this->origin->x -= 0.5;
-    this->origin->y -= 0.2;
-    this->destination->x += 0.5;
-    this->destination->y += 0.2;
+    this->origin->x -= 0.4;
+    this->origin->y -= 0.25;
+    this->destination->x += 0.4;
+    this->destination->y += 0.25;
+	return 0;
   }
 
   ~BoundingBox(){
+	  std::cout << "destruct bbox" << std::endl;
     delete origin;
     delete destination;
   }
