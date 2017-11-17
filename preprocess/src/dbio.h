@@ -60,8 +60,8 @@ public:
   int dbfind(vector<ProtectedArea *> &areas,
 	  vector<vector<Geogrid*>> &geo_grid,
       string syntax = "{}", string collection_name = "grid"){
-    mongocxx::collection coll = db["grid"];
-	mongocxx::collection coll_out = db["test10w"];
+    mongocxx::collection coll = db["grid_Montana2"];
+	mongocxx::collection coll_out = db["Montana_Metro_2"];
 	std::cout << "fuck the mongo lib" << std::endl;
 	for (int i = 0; i < (GRID_LARGEST_LAT - GRID_ORIGION_LAT) / TEN_KM_LAT + 1;
 		i++) {
@@ -98,7 +98,7 @@ public:
 	mongocxx::options::find opts;
 	opts=opts.no_cursor_timeout(true);
 	opts=opts.allow_partial_results(true);
-	opts = opts.limit(300000000);
+	opts = opts.limit(700000000);
 	mongocxx::cursor cursor = coll.find(document{}<<finalize,opts);
     vector<bsoncxx::document::value> documents;
     int count_document=1;
@@ -114,7 +114,7 @@ public:
 	Point_2d *p=new Point_2d(0, 0);
 	start = std::clock();
     for (auto doc : cursor) {
-	  if (count > 10) break;
+	  //if (count > 10) break;
 	  s=bsoncxx::to_json(doc);
       out_str="";
 	  total++;
@@ -126,12 +126,13 @@ public:
         for (int i=0;i<areas.size();i++){
           if (dist < 0) break;
           if (!areas[i]->insidePA(p)) continue;
+		  bool flag = false;
           for (int j=0;j<areas[i]->polygons.size();j++){
             if (areas[i]->polygons[j]->contain(*p)) {
-              dist = -1.0;
-              break;
+				flag = !flag;
             }
           }
+		  if (flag) dist = -1.0;
         }
 		if (dist > 0) {
 			int row = static_cast<int>(std::floor((p->y - GRID_ORIGION_LAT) / TEN_KM_LAT));

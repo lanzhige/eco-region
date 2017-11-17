@@ -13,12 +13,13 @@ using std::vector;
 int main(){
   vector<ProtectedArea *> areas;
   vector<vector<Geogrid*>> geo_grid(0,vector<Geogrid*>(0,nullptr));
-  initJsonArea(areas
+  /*initJsonArea(areas
       , "C:/Users/lzhan253/Documents/WA.json");
   initJsonArea(areas
       , "C:/Users/lzhan253/Documents/ID.json");
   initJsonArea(areas
-      , "C:/Users/lzhan253/Documents/OR.json");
+      , "C:/Users/lzhan253/Documents/OR.json");*/
+  initJsonArea(areas, "C:/Users/lzhan253/Documents/MT_city.json");
 
   std::cout<<"json read finished!"<<std::endl;
   for (int i=0;i<areas.size();i++)
