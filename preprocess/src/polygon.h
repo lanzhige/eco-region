@@ -78,7 +78,7 @@ struct Polygon{
       if (coords[i]->y > destination.y) destination.y = coords[i]->y;
     }
     bbox.setBoundary(origin, destination);
-    bbox.extend();
+    //bbox.extend();
     return 0;
   }
 

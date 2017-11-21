@@ -60,8 +60,8 @@ public:
   int dbfind(vector<ProtectedArea *> &areas,
 	  vector<vector<Geogrid*>> &geo_grid,
       string syntax = "{}", string collection_name = "grid"){
-    mongocxx::collection coll = db["grid_Montana2"];
-	mongocxx::collection coll_out = db["Montana_Metro_2"];
+    mongocxx::collection coll = db["grid_Washington"];
+	mongocxx::collection coll_out = db["Washington_PA3"];
 	std::cout << "fuck the mongo lib" << std::endl;
 	for (int i = 0; i < (GRID_LARGEST_LAT - GRID_ORIGION_LAT) / TEN_KM_LAT + 1;
 		i++) {
@@ -123,22 +123,35 @@ public:
         p->x=root["properties"]["center"][0].asDouble();
         p->y=root["properties"]["center"][1].asDouble();
         dist = MAX_DIST;
-        for (int i=0;i<areas.size();i++){
-          if (dist < 0) break;
+
+		int test_flag = 0;
+
+		if (total > 100000) {
+			std::cout << "a 100000 finished!"<<std::endl;
+			total -= 100000;
+		}
+
+        for (int i=0; i<areas.size(); i++){
           if (!areas[i]->insidePA(p)) continue;
 		  bool flag = false;
-          for (int j=0;j<areas[i]->polygons.size();j++){
+          for (int j=0; j<areas[i]->polygons.size(); j++){
             if (areas[i]->polygons[j]->contain(*p)) {
 				flag = !flag;
+				test_flag++;
             }
           }
-		  if (flag) dist = -1.0;
+		  if (flag) {
+			  dist = -1.0;
+			  break;
+		  }
         }
-		if (dist > 0) {
+		if (dist > 0&&test_flag>0) {
 			int row = static_cast<int>(std::floor((p->y - GRID_ORIGION_LAT) / TEN_KM_LAT));
 			int col = static_cast<int>(std::floor((p->x - GRID_ORIGION_LNG) / TEN_KM_LNG));
 			dist = min(dist, geo_grid[row][col]->shortestDistance(p));
 		}
+		else continue;
+
         if (dist<=MAX_THRES&&dist>=0) {
           Json::StyledWriter writer;
           root["properties"]["dist"]=dist;
