@@ -149,6 +149,46 @@ int initJsonArea(vector<ProtectedArea *> &areas,const char *file = nullptr) {
   is.close();
   return 0;
 }
+
+#include "geo.h"
+
+int initMultiPolygon(mpolygon_t &mpoly, const char *file = nullptr) {
+	Json::Reader reader;
+	Json::Value root;
+
+	std::ifstream is;
+	is.open(file, std::ios::binary);
+	if (reader.parse(is, root)) {
+		int file_size;
+		if (!root["features"].isNull()) file_size = root["features"].size();
+		int base_size = mpoly.size();
+		mpoly.resize(base_size+file_size);
+		for (int i = 0; i < file_size; i++) {
+			Json::Value coords = root["features"][i]["geometry"]["rings"];
+			int coords_size = coords.size();
+			if (coords_size > 1) {
+				mpoly[base_size + i].inners().resize(coords_size-1);
+			}
+			for (int k = 0; k < coords_size; k++) {
+				Json::Value polys = coords[k];
+				int poly_size = polys.size();
+				//for (int p = 0; p < poly_size; p++){
+				//  Json::Value pairs = polys[p];
+				//  int pair_size = pairs.size();
+				for (int q = 0; q < poly_size; q++) {
+					if (k > 0) {
+						append(mpoly[base_size + i].inners()[k-1], spherical_point(polys[q][0].asDouble(), polys[q][1].asDouble()));
+					}
+					else {
+						append(mpoly[base_size + i].outer(), spherical_point(polys[q][0].asDouble(), polys[q][1].asDouble()));
+					}
+				}
+			}
+		}
+	}
+	is.close();
+	return 0;
+}
 /*
 int outJson(vector<Polygon *> &areas, Grid &grid){
   std::ofstream os("/home/lzhan253/project/eco-region/preprocess/data/out.json", std::ofstream::out);
