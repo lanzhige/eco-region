@@ -25,8 +25,8 @@ struct Polygon{
     for (unsigned int i = 1; i < size; i = i + 2) {
       coords.push_back(new Point_2d(data[i - 1], data[i]));
     }
-    if (!( coords[coords.size() - 1] == coords[0] ))
-        coords.push_back(coords[0]);
+    /*if (!( coords[coords.size() - 1] == coords[0] ))
+        coords.push_back(coords[0]);*/
     //link the last node to the first node, might should be replaced by emplace_back
   }
 
@@ -78,7 +78,7 @@ struct Polygon{
       if (coords[i]->y > destination.y) destination.y = coords[i]->y;
     }
     bbox.setBoundary(origin, destination);
-    //bbox.extend();
+    bbox.extend();
     return 0;
   }
 

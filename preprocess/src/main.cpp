@@ -104,6 +104,7 @@ int main() {
 	initJsonArea(areas, "C:/Users/lzhan253/Documents/UT_PA.json");
 
 	initJsonArea(areas, "C:/Users/lzhan253/Documents/WY_PA.json");
+	//initJsonRail(areas, "C:/Users/lzhan253/Documents/MT_Rail.json");
 
 	std::cout << "json read finished!" << std::endl;
 	for (int i = 0; i<areas.size(); i++)
@@ -115,7 +116,7 @@ int main() {
 
 	DBio db;
 	db.initMongo();
-	db.testDist(areas, geo_grid, "Idaho_PA");
+	db.testDist(areas, geo_grid, "Idaho_PA2");
 
 	return 0;
 }
