@@ -9,9 +9,6 @@ struct Geogrid {
 	vector<std::pair<Point_2d*, Point_2d*>> outter;
 	double shortestDistance(Point_2d *p) {
 		double dist = MAX_DIST;
-		//std::cout << "inner size: " << inner.size() << std::endl;
-		//std::cout << "outter size: " << outter.size() << std::endl;
-		//std::cout << "middle size" << middle.size() << std::endl;
 		for (int i = 0; i < inner.size(); i++) {
 			dist = min(dist, p->toSegDist(inner[i].first, inner[i].second));
 		}
