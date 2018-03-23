@@ -7,4 +7,6 @@ from the grids provided in data to the shapes.
 
 To compile:
 
-cmake .. -G "Visual Studio 14 Win64" -DBOOST_ROOT=c:\boost -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_BOOST=1 -DCMAKE_INSTALL_PREFIX=C:\mongo-cxx-driver -DLIBMONGOC_DIR=C:\mongo-c-driver\ -DLIBBSON_DIR=C:\mongo-c-driver\ -DCMAKE_PREFIX_PATH=c:\mongo-c-driver 
+use install.sh to install the program, boost and mongocxx are required to compile the program.
+
+Please change the directory of packages in install.sh if the required lib can't be found.
